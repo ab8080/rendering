@@ -14,6 +14,7 @@
 #include <vtkBoxWidget.h>
 #include <vtkCamera.h>
 #include <vtkCommand.h>
+#include <vtkFeatureEdges.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkJPEGReader.h>
 #include <vtkLight.h>
@@ -93,6 +94,21 @@ int main(int, char*[]) {
 
     vtkNew<vtkInteractorStyleTrackballCamera> style;
     iren->SetInteractorStyle(style);
+
+    vtkNew<vtkFeatureEdges> featureEdges;
+    featureEdges->SetInputConnection(objReader->GetOutputPort());
+    featureEdges->BoundaryEdgesOn();
+    featureEdges->FeatureEdgesOff();
+    featureEdges->NonManifoldEdgesOff();
+    featureEdges->ManifoldEdgesOff();
+
+    vtkNew<vtkPolyDataMapper> edgeMapper;
+    edgeMapper->SetInputConnection(featureEdges->GetOutputPort());
+
+    vtkNew<vtkActor> edgeActor;
+    edgeActor->SetMapper(edgeMapper);
+    edgeActor->GetProperty()->SetColor(colors->GetColor3d("Red").GetData());
+    ren1->AddActor(edgeActor);
 
     vtkNew<vtkBoxWidget> boxWidget;
     boxWidget->SetInteractor(iren);
