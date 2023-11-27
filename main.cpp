@@ -10,22 +10,22 @@
 
 =========================================================================*/
 
-// Include the necessary header files for the VTK classes we are using.
 #include <vtkActor.h>
 #include <vtkBoxWidget.h>
 #include <vtkCamera.h>
 #include <vtkCommand.h>
 #include <vtkInteractorStyleTrackballCamera.h>
-#include <vtkJPEGReader.h>       // Include vtkJPEGReader for reading JPEG files
+#include <vtkJPEGReader.h>
+#include <vtkLight.h>
 #include <vtkNamedColors.h>
 #include <vtkNew.h>
-#include <vtkOBJReader.h>        // Include vtkOBJReader for reading OBJ files
+#include <vtkOBJReader.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
-#include <vtkTexture.h>          // Include vtkTexture for applying texture
+#include <vtkTexture.h>
 #include <vtkTransform.h>
 
 namespace {
@@ -46,62 +46,67 @@ namespace {
 int main(int, char*[]) {
     vtkNew<vtkNamedColors> colors;
 
-    // Create a new vtkOBJReader
     vtkNew<vtkOBJReader> objReader;
     objReader->SetFileName("/home/aleksandr/CLionProjects/individual/mesh.obj");
 
-    // Create a new vtkPolyDataMapper and set the objReader as its input
     vtkNew<vtkPolyDataMapper> mapper;
     mapper->SetInputConnection(objReader->GetOutputPort());
 
-    // Create a new vtkJPEGReader to read the texture
     vtkNew<vtkJPEGReader> jpegReader;
     jpegReader->SetFileName("/home/aleksandr/Документы/7sem/polevoy/rendering/chess.jpeg");
 
-    // Create a new vtkTexture and set the jpegReader as its input
     vtkNew<vtkTexture> texture;
     texture->SetInputConnection(jpegReader->GetOutputPort());
 
-    // Create an actor to represent the loaded 3D mesh and set the texture
     vtkNew<vtkActor> actor;
     actor->SetMapper(mapper);
     actor->SetTexture(texture);
 
-    // Create the Renderer and assign actors to it.
     vtkNew<vtkRenderer> ren1;
     ren1->AddActor(actor);
     ren1->SetBackground(colors->GetColor3d("MidnightBlue").GetData());
 
-    // Create the render window
+    vtkNew<vtkCamera> camera;
+    camera->SetPosition(0, 0, 1);
+    camera->SetFocalPoint(actor->GetPosition());
+    camera->SetViewUp(0, 1, 0);
+    ren1->SetActiveCamera(camera);
+
+    vtkNew<vtkLight> light;
+    light->SetLightTypeToSceneLight();
+    light->SetPosition(1, 1, 1);
+    light->SetPositional(true);
+    light->SetConeAngle(30);
+    light->SetFocalPoint(actor->GetPosition());
+    light->SetDiffuseColor(colors->GetColor3d("White").GetData());
+    light->SetAmbientColor(colors->GetColor3d("Gray").GetData());
+    light->SetSpecularColor(colors->GetColor3d("White").GetData());
+    ren1->AddLight(light);
+
     vtkNew<vtkRenderWindow> renWin;
     renWin->AddRenderer(ren1);
     renWin->SetSize(300, 300);
     renWin->SetWindowName("Tutorial_Step6");
 
-    // The vtkRenderWindowInteractor class watches for events in the vtkRenderWindow.
     vtkNew<vtkRenderWindowInteractor> iren;
     iren->SetRenderWindow(renWin);
 
-    // Specify a particular interactor style.
     vtkNew<vtkInteractorStyleTrackballCamera> style;
     iren->SetInteractorStyle(style);
 
-    // Use a vtkBoxWidget to transform the underlying actor.
     vtkNew<vtkBoxWidget> boxWidget;
     boxWidget->SetInteractor(iren);
     boxWidget->SetPlaceFactor(1.25);
     boxWidget->GetOutlineProperty()->SetColor(colors->GetColor3d("Gold").GetData());
 
-    // Place the interactor initially.
     boxWidget->SetProp3D(actor);
     boxWidget->PlaceWidget();
+
     vtkNew<vtkMyCallback> callback;
     boxWidget->AddObserver(vtkCommand::InteractionEvent, callback);
 
-    // Enable the box widget.
     boxWidget->On();
 
-    // Start the event loop.
     iren->Initialize();
     iren->Start();
 
