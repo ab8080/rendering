@@ -15,6 +15,7 @@ find_package(VTK COMPONENTS
         RenderingGL2PSOpenGL2
         RenderingOpenGL2
         IOGeometry
+        IOXML
         )
 
 if (NOT VTK_FOUND)

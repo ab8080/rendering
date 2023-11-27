@@ -33,13 +33,13 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 26,
+				"line" : 27,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 27,
+				"line" : 28,
 				"parent" : 0
 			},
 			{
@@ -61,6 +61,12 @@
 			{
 				"file" : 1,
 				"parent" : 5
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 543,
+				"parent" : 6
 			},
 			{
 				"command" : 2,
@@ -155,14 +161,14 @@
 			{
 				"command" : 6,
 				"file" : 0,
-				"line" : 30,
+				"line" : 31,
 				"parent" : 0
 			},
 			{
 				"command" : 5,
 				"file" : 3,
 				"line" : 3371,
-				"parent" : 22
+				"parent" : 23
 			}
 		]
 	},
@@ -182,15 +188,15 @@
 					"define" : "kiss_fft_scalar=double"
 				},
 				{
-					"backtrace" : 23,
+					"backtrace" : 24,
 					"define" : "vtkRenderingContext2D_AUTOINIT_INCLUDE=\"/home/aleksandr/CLionProjects/individual/cmake-build-debug/CMakeFiles/vtkModuleAutoInit_04d683062bbc5774e34e8c62b13e1a5a.h\""
 				},
 				{
-					"backtrace" : 23,
+					"backtrace" : 24,
 					"define" : "vtkRenderingCore_AUTOINIT_INCLUDE=\"/home/aleksandr/CLionProjects/individual/cmake-build-debug/CMakeFiles/vtkModuleAutoInit_04d683062bbc5774e34e8c62b13e1a5a.h\""
 				},
 				{
-					"backtrace" : 23,
+					"backtrace" : 24,
 					"define" : "vtkRenderingOpenGL2_AUTOINIT_INCLUDE=\"/home/aleksandr/CLionProjects/individual/cmake-build-debug/CMakeFiles/vtkModuleAutoInit_04d683062bbc5774e34e8c62b13e1a5a.h\""
 				}
 			],
@@ -267,7 +273,17 @@
 				"role" : "libraries"
 			},
 			{
+				"backtrace" : 2,
+				"fragment" : "/usr/local/lib/libvtkIOXML-9.3.so.9.3",
+				"role" : "libraries"
+			},
+			{
 				"backtrace" : 7,
+				"fragment" : "/usr/local/lib/libvtkIOXMLParser-9.3.so.9.3",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 8,
 				"fragment" : "/usr/local/lib/libvtkRenderingContext2D-9.3.so.9.3",
 				"role" : "libraries"
 			},
@@ -277,57 +293,57 @@
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 8,
+				"backtrace" : 9,
 				"fragment" : "/usr/local/lib/libvtkfreetype-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 9,
+				"backtrace" : 10,
 				"fragment" : "/usr/local/lib/libvtkRenderingHyperTreeGrid-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 9,
+				"backtrace" : 10,
 				"fragment" : "/usr/local/lib/libvtkRenderingUI-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 9,
+				"backtrace" : 10,
 				"fragment" : "/usr/local/lib/libvtkglew-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 10,
+				"backtrace" : 11,
 				"fragment" : "/usr/lib/x86_64-linux-gnu/libGLX.so",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 10,
+				"backtrace" : 11,
 				"fragment" : "/usr/lib/x86_64-linux-gnu/libOpenGL.so",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 9,
+				"backtrace" : 10,
 				"fragment" : "/usr/lib/x86_64-linux-gnu/libX11.so",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 9,
+				"backtrace" : 10,
 				"fragment" : "/usr/local/lib/libvtkIOImage-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 11,
+				"backtrace" : 12,
 				"fragment" : "/usr/local/lib/libvtkIOLegacy-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 11,
+				"backtrace" : 12,
 				"fragment" : "/usr/local/lib/libvtkIOCore-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 12,
+				"backtrace" : 13,
 				"fragment" : "/usr/local/lib/libvtkzlib-9.3.so.9.3",
 				"role" : "libraries"
 			},
@@ -347,27 +363,27 @@
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 7,
+				"backtrace" : 8,
 				"fragment" : "/usr/local/lib/libvtkFiltersGeneral-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 13,
+				"backtrace" : 14,
 				"fragment" : "/usr/local/lib/libvtkImagingCore-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 14,
+				"backtrace" : 15,
 				"fragment" : "/usr/local/lib/libvtkFiltersCore-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 15,
+				"backtrace" : 16,
 				"fragment" : "/usr/local/lib/libvtkCommonExecutionModel-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 16,
+				"backtrace" : 17,
 				"fragment" : "/usr/local/lib/libvtkCommonDataModel-9.3.so.9.3",
 				"role" : "libraries"
 			},
@@ -377,17 +393,17 @@
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 17,
+				"backtrace" : 18,
 				"fragment" : "/usr/local/lib/libvtkCommonMisc-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 18,
+				"backtrace" : 19,
 				"fragment" : "/usr/local/lib/libvtkCommonMath-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 19,
+				"backtrace" : 20,
 				"fragment" : "/usr/local/lib/libvtkkissfft-9.3.so.9.3",
 				"role" : "libraries"
 			},
@@ -397,12 +413,12 @@
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 20,
+				"backtrace" : 21,
 				"fragment" : "/usr/local/lib/libvtksys-9.3.so.9.3",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 21,
+				"backtrace" : 22,
 				"fragment" : "-ldl",
 				"role" : "libraries"
 			},
