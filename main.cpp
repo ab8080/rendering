@@ -19,6 +19,8 @@
 #include <vtkTransform.h>
 #include <vtkWindowToImageFilter.h>
 #include <vtkXMLPolyDataWriter.h>
+#include <vtkCylinderSource.h>
+#include <vtkPlaneSource.h>
 
 namespace {
     class vtkMyCallback : public vtkCommand { // vtkCommand — это базовый класс для всех callback'ов в VTK,
@@ -51,10 +53,21 @@ int main(int, char*[]) {
     vtkNew<vtkOBJReader> objReader; // Создается объект для чтения 3D-модели из файла
     objReader->SetFileName("/home/aleksandr/CLionProjects/individual/mesh.obj");
 
+    // Создание источника плоскости
+    vtkNew<vtkPlaneSource> planeSource;
+    planeSource->SetCenter(0.0, 0.0, 0.0);
+    planeSource->Update();
+
+    // Создание трансформации для изгиба плоскости
+    vtkNew<vtkTransform> transform;
+    transform->PostMultiply(); // Для применения масштабирования после остальных трансформаций
+    transform->RotateX(45); // Поворот плоскости, чтобы создать эффект изгиба
+
     // Создается маппер (mapper), который преобразует полигональные данные, полученные от objReader,
     // в графические примитивы, которые можно отрисовать на экране.
     vtkNew<vtkPolyDataMapper> mapper;
     mapper->SetInputConnection(objReader->GetOutputPort());
+    mapper->SetInputConnection(planeSource->GetOutputPort());
 
     // Создается объект для чтения изображения в формате JPEG, которое будет использоваться как текстура.
     vtkNew<vtkJPEGReader> jpegReader;
@@ -69,6 +82,7 @@ int main(int, char*[]) {
     vtkNew<vtkActor> actor;
     actor->SetMapper(mapper);
     actor->SetTexture(texture);
+    actor->SetUserTransform(transform);
 
     // Создается рендерер (renderer), который управляет тем, как сцена отображается.
     // В рендерер добавляется актор, и устанавливается цвет фона сцены.
@@ -89,7 +103,7 @@ int main(int, char*[]) {
     light->SetLightTypeToSceneLight(); // Устанавливается тип света как "сценический свет", что означает,
     // что свет будет рассматриваться как часть сцены и будет влиять на объекты внутри нее.
 
-    light->SetPosition(0.1, -1.4, 2.1); // Задается положение источника света в пространстве сцены.
+    light->SetPosition(0.1, -1.2, 2.1); // Задается положение источника света в пространстве сцены.
 
     light->SetPositional(true); // Указывает, что свет является позиционным (в отличие от направленного),
     // что означает, что он будет иметь определенное положение и характеристики, такие как затухание и конус света.

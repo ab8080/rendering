@@ -10,8 +10,7 @@
         <DataArray type="Float32" Name="GroupIds" format="appended" RangeMin="0"                    RangeMax="0"                    offset="100"                 />
       </CellData>
       <Points>
-        <DataArray type="Float64" Name="Points" NumberOfComponents="3" format="appended" RangeMin="0"                    RangeMax="1.4142135624"         offset="140"                 >
-        </DataArray>
+        <DataArray type="Float64" Name="Points" NumberOfComponents="3" format="appended" RangeMin="0"                    RangeMax="1.4142135624"         offset="140"                 />
       </Points>
       <Verts>
         <DataArray type="Int64" Name="connectivity" format="appended" RangeMin=""                     RangeMax=""                     offset="196"                 />
