@@ -55,6 +55,9 @@ int main(int, char*[]) {
 
     // Создание источника плоскости
     vtkNew<vtkPlaneSource> planeSource;
+    planeSource->SetOrigin(0.0, 0.0, 0.0);
+    planeSource->SetPoint1(0.913, 0.0, 0.0);
+    planeSource->SetPoint2(0.0, 1.291, 0.0);
     planeSource->SetCenter(0.0, 0.0, 0.0);
     planeSource->Update();
 
@@ -189,7 +192,7 @@ int main(int, char*[]) {
     // Инициализация интерактора и начало цикла рендеринга
     iren->Initialize();
 
-   // делает скриншот
+    // делает скриншот
     vtkNew<vtkWindowToImageFilter> windowToImageFilter;
     windowToImageFilter->SetInput(renWin);
     windowToImageFilter->SetScale(1); // устанавливает масштаб
@@ -208,7 +211,7 @@ int main(int, char*[]) {
     polyDataWriter->SetInputConnection(objReader->GetOutputPort());
     polyDataWriter->Write();
 
-// Начать взаимодействие
+    // Начать взаимодействие
     iren->Start();
 
 
