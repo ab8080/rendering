@@ -74,7 +74,7 @@ int main(int, char*[]) {
 
     // Создается объект для чтения изображения в формате JPEG, которое будет использоваться как текстура.
     vtkNew<vtkJPEGReader> jpegReader;
-    jpegReader->SetFileName("/home/aleksandr/Документы/7sem/polevoy/rendering/chess.jpeg");
+    jpegReader->SetFileName("../chess.jpeg");
 
     // Создается текстура и ей устанавливается источник данных - выходной поток jpegReader.
     vtkNew<vtkTexture> texture;
