@@ -47,6 +47,42 @@ namespace {
     };
 }
 
+double calculateFOVHorizontal(double fovVertical, double aspectRatio) {
+    double fovVerticalRadians = vtkMath::RadiansFromDegrees(fovVertical);
+    double fovHorizontalRadians = 2 * atan(tan(fovVerticalRadians / 2) * aspectRatio);
+    return fovHorizontalRadians;
+}
+
+void setBackgroundPlaneSize(vtkCamera* camera, vtkPlaneSource* backgroundPlane, double windowWidth, double windowHeight) {
+    // Аспектное соотношение окна рендеринга
+    double aspectRatio = windowWidth / windowHeight;
+
+    // Расстояние от камеры до фоновой плоскости - предположим, что плоскость должна быть
+    // на 0.1 меньше по Z, чем самый дальний объект, чтобы избежать перекрытия
+    double distanceToBackground = 1.5; // Вы можете установить это значение экспериментально
+
+    // Вертикальный угол обзора камеры
+    double verticalFOV = camera->GetViewAngle();
+
+    // Рассчитываем горизонтальный угол обзора, исходя из вертикального угла обзора и аспектного соотношения
+    double horizontalFOV = 2.0 * atan(tan(vtkMath::RadiansFromDegrees(verticalFOV) / 2.0) * aspectRatio);
+
+    // Рассчитываем ширину и высоту фоновой плоскости
+    double backgroundHeight = 20.0 * distanceToBackground * tan(vtkMath::RadiansFromDegrees(verticalFOV) / 2.0);
+    double backgroundWidth = 20.0 * distanceToBackground * tan(horizontalFOV / 2.0);
+
+
+    // Теперь устанавливаем размеры фоновой плоскости
+    backgroundPlane->SetOrigin(-backgroundWidth / 2.0, -backgroundHeight / 2.0, -distanceToBackground);
+    backgroundPlane->SetPoint1(backgroundWidth / 2.0, -backgroundHeight / 2.0, -distanceToBackground);
+    backgroundPlane->SetPoint2(-backgroundWidth / 2.0, backgroundHeight / 2.0, -distanceToBackground);
+    backgroundPlane->Update();
+}
+
+double xTranslation = -1; // Сдвиг влево [-5; 0.6]
+double yTranslation = 0;  // Сдвиг вверх [0; 2.5]
+double zTranslation = 0.5;  // Без изменения глубины [0; 1]
+
 int main(int, char*[]) {
     vtkNew<vtkNamedColors> colors; // Создается объект для управления цветами, который предоставляет доступ к предопределенным цветам.
 
@@ -85,6 +121,7 @@ int main(int, char*[]) {
     vtkNew<vtkActor> actor;
     actor->SetMapper(mapper);
     actor->SetTexture(texture);
+    transform->Translate(xTranslation, yTranslation, zTranslation);
     actor->SetUserTransform(transform);
 
     // Создается рендерер (renderer), который управляет тем, как сцена отображается.
@@ -95,18 +132,54 @@ int main(int, char*[]) {
 
     // Создается новый объект камеры, который определяет точку зрения, с которой будет производиться рендеринг сцены.
     vtkNew<vtkCamera> camera;
-    camera->SetPosition(0, -1.5, 2);
+    camera->SetPosition(2, -3.5, 2); // вот тут менять расположение камеры в цикле для генерации разных штрих-кодов
     camera->SetFocalPoint(actor->GetPosition()); // камера направлена на положение актора в сцене, то есть то место, где расположен объект.
     camera->SetViewUp(0, 1, 0);
     ren1->SetActiveCamera(camera); // созданная камера назначается активной для рендерера ren1,
     // который затем будет использовать ее для определения, как должна выглядеть сцена.
+
+
+    // Шаг 1: Загрузка изображения фона
+    vtkNew<vtkJPEGReader> backgroundReader;
+    backgroundReader->SetFileName("/home/aleksandr/PycharmProjects/barcodes/venv/photos/IMG_20220730_002303_675.jpg"); // Укажите правильный путь к файлу
+
+    // Шаг 2: Создание плоскости для фона
+    vtkNew<vtkPlaneSource> backgroundPlane;
+    setBackgroundPlaneSize(camera, backgroundPlane, 1920.0, 1080.0);
+
+    // Шаг 3: Применение текстуры фона
+    vtkNew<vtkTexture> backgroundTexture;
+    backgroundTexture->SetInputConnection(backgroundReader->GetOutputPort());
+
+    // Шаг 4: Добавление плоскости с текстурой в рендерер
+    vtkNew<vtkPolyDataMapper> backgroundMapper;
+    backgroundMapper->SetInputConnection(backgroundPlane->GetOutputPort());
+
+    vtkNew<vtkActor> backgroundActor;
+    backgroundActor->SetMapper(backgroundMapper);
+    backgroundActor->SetTexture(backgroundTexture);
+
+    // Создаем трансформацию для фоновой плоскости
+    vtkNew<vtkTransform> backgroundTransform;
+    backgroundTransform->PostMultiply(); // Применять масштабирование после других трансформаций
+    backgroundTransform->RotateX(60); // Тот же угол поворота, что и у объекта
+    backgroundActor->SetUserTransform(backgroundTransform); // Применяем трансформацию к фоновому актору
+
+    // Смещаем фон влево и вверх
+    // Значения смещения подбираются экспериментально, чтобы соответствовать вашим требованиям
+    double shiftLeft = -2; // Смещение влево; отрицательное значение перемещает влево
+    double shiftUp = 1; // Смещение вверх; положительное значение перемещает вверх
+    backgroundTransform->Translate(shiftLeft, shiftUp, 0.0);
+
+    ren1->AddActor(backgroundActor); // Убедитесь, что это делается перед добавлением других акторов
+
 
     vtkNew<vtkLight> light; // Создается новый объект света, который будет освещать сцену.
 
     light->SetLightTypeToSceneLight(); // Устанавливается тип света как "сценический свет", что означает,
     // что свет будет рассматриваться как часть сцены и будет влиять на объекты внутри нее.
 
-    light->SetPosition(0.1, -1.2, 2.1); // Задается положение источника света в пространстве сцены.
+    light->SetPosition(5* 0.1, 5* -1.2, 5* 2.1); // Задается положение источника света в пространстве сцены.
 
     light->SetPositional(true); // Указывает, что свет является позиционным (в отличие от направленного),
     // что означает, что он будет иметь определенное положение и характеристики, такие как затухание и конус света.
@@ -175,7 +248,7 @@ int main(int, char*[]) {
     boxWidget->SetInteractor(iren);
     boxWidget->SetPlaceFactor(1.25); // виджет будет на 25% больше, чем ограничивающий прямоугольник объекта.
     boxWidget->GetOutlineProperty()->SetColor(colors->GetColor3d("Gold").GetData());
-
+    boxWidget->GetOutlineProperty()->SetOpacity(0.0); // Сделать рамку полностью прозрачной
     // Виджет связывается с actor, что позволяет ему контролировать положение и ориентацию объекта.
     boxWidget->SetProp3D(actor);
     // Размещает виджет в сцене в соответствии с текущими размерами и позицией связанного объекта.
@@ -188,6 +261,7 @@ int main(int, char*[]) {
 
     // Включает виджет, делая его активным и видимым в сцене для взаимодействия с пользователем
     boxWidget->On();
+    boxWidget->Off();
 
     // Инициализация интерактора и начало цикла рендеринга
     iren->Initialize();
@@ -213,7 +287,6 @@ int main(int, char*[]) {
 
     // Начать взаимодействие
     iren->Start();
-
 
     return EXIT_SUCCESS;
 }
