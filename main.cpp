@@ -141,7 +141,7 @@ int main(int, char*[]) {
 
     // Шаг 1: Загрузка изображения фона
     vtkNew<vtkJPEGReader> backgroundReader;
-    backgroundReader->SetFileName("/home/aleksandr/PycharmProjects/barcodes/venv/photos/IMG_20220730_002303_675.jpg"); // Укажите правильный путь к файлу
+    backgroundReader->SetFileName("/home/aleksandr/PycharmProjects/barcodes/venv/photos/20231115_125455.jpg"); // Укажите правильный путь к файлу
 
     // Шаг 2: Создание плоскости для фона
     vtkNew<vtkPlaneSource> backgroundPlane;
