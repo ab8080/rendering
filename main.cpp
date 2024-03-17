@@ -21,6 +21,7 @@
 #include <vtkXMLPolyDataWriter.h>
 #include <vtkCylinderSource.h>
 #include <vtkPlaneSource.h>
+#include <sstream>
 
 namespace {
     class vtkMyCallback : public vtkCommand { // vtkCommand — это базовый класс для всех callback'ов в VTK,
@@ -45,6 +46,18 @@ namespace {
 
         }
     };
+}
+
+std::vector<std::string> split(const std::string& s, char delimiter) {
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(s);
+
+    while (std::getline(tokenStream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+
+    return tokens;
 }
 
 double calculateFOVHorizontal(double fovVertical, double aspectRatio) {
@@ -79,11 +92,61 @@ void setBackgroundPlaneSize(vtkCamera* camera, vtkPlaneSource* backgroundPlane, 
     backgroundPlane->Update();
 }
 
+std::array<double, 2> Get2DProjection(vtkCamera* camera, vtkRenderer* renderer, double x, double y, double z) {
+    double worldCoordinate[4] = {x, y, z, 1.0};
+    double displayCoordinate[3];
+
+    renderer->SetWorldPoint(worldCoordinate);
+    renderer->WorldToDisplay();
+    renderer->GetDisplayPoint(displayCoordinate);
+
+    return {displayCoordinate[0], displayCoordinate[1]};
+}
+
+// Функция для записи координат в JSON-формат
+void SaveCoordinatesAsJSON(const std::vector<std::array<double, 2>>& coordinates, const std::string& filename) {
+    std::ofstream outFile(filename);
+    if (!outFile.is_open()) {
+        std::cerr << "Не удалось открыть файл для записи." << std::endl;
+        return;
+    }
+
+    outFile << "{" << std::endl;
+    outFile << "  \"all_points_x\": [";
+    for (size_t i = 0; i < coordinates.size(); ++i) {
+        outFile << coordinates[i][0];
+        if (i < coordinates.size() - 1)
+            outFile << ", ";
+    }
+    outFile << "]," << std::endl;
+
+    outFile << "  \"all_points_y\": [";
+    for (size_t i = 0; i < coordinates.size(); ++i) {
+        outFile << coordinates[i][1];
+        if (i < coordinates.size() - 1)
+            outFile << ", ";
+    }
+    outFile << "]" << std::endl;
+    outFile << "}" << std::endl;
+
+    outFile.close();
+}
+
+std::array<double, 2> ConvertToImageCoordinates(double x, double y, int imageWidth, int imageHeight) {
+    // Преобразование координат из системы координат VTK в систему координат изображения.
+    double newX = x + imageWidth / 2.0;
+    double newY = imageHeight / 2.0 - y;
+    return {newX, newY};
+}
+
 double xTranslation = -1; // Сдвиг влево [-5; 0.6]
 double yTranslation = 0;  // Сдвиг вверх [0; 2.5]
 double zTranslation = 0.5;  // Без изменения глубины [0; 1]
 
-int main(int, char*[]) {
+int main(int argc, char* argv[]) {
+    const char* modelFilePath = argv[1]; // Путь к 3D модели
+    const char* backgroundImageFilePath = argv[2]; // Путь к фоновому изображению
+
     vtkNew<vtkNamedColors> colors; // Создается объект для управления цветами, который предоставляет доступ к предопределенным цветам.
 
     vtkNew<vtkOBJReader> objReader; // Создается объект для чтения 3D-модели из файла
@@ -91,10 +154,9 @@ int main(int, char*[]) {
 
     // Создание источника плоскости
     vtkNew<vtkPlaneSource> planeSource;
-    planeSource->SetOrigin(0.0, 0.0, 0.0);
-    planeSource->SetPoint1(0.913, 0.0, 0.0);
-    planeSource->SetPoint2(0.0, 1.291, 0.0);
-    planeSource->SetCenter(0.0, 0.0, 0.0);
+    planeSource->SetOrigin(-0.5, -0.5, 0); // Координаты для квадратной плоскости
+    planeSource->SetPoint1(0.5, -0.5, 0);
+    planeSource->SetPoint2(-0.5, 0.5, 0);
     planeSource->Update();
 
     // Создание трансформации для изгиба плоскости
@@ -110,7 +172,7 @@ int main(int, char*[]) {
 
     // Создается объект для чтения изображения в формате JPEG, которое будет использоваться как текстура.
     vtkNew<vtkJPEGReader> jpegReader;
-    jpegReader->SetFileName("../chess.jpeg");
+    jpegReader->SetFileName(modelFilePath);
 
     // Создается текстура и ей устанавливается источник данных - выходной поток jpegReader.
     vtkNew<vtkTexture> texture;
@@ -132,7 +194,11 @@ int main(int, char*[]) {
 
     // Создается новый объект камеры, который определяет точку зрения, с которой будет производиться рендеринг сцены.
     vtkNew<vtkCamera> camera;
-    camera->SetPosition(2, -3.5, 2); // вот тут менять расположение камеры в цикле для генерации разных штрих-кодов
+    double cameraXPos = 2;
+    double cameraYPos = -3.1;
+    double cameraZPos = 2;
+
+    camera->SetPosition(cameraXPos, cameraYPos, cameraZPos); // вот тут менять расположение камеры в цикле для генерации разных штрих-кодов
     camera->SetFocalPoint(actor->GetPosition()); // камера направлена на положение актора в сцене, то есть то место, где расположен объект.
     camera->SetViewUp(0, 1, 0);
     ren1->SetActiveCamera(camera); // созданная камера назначается активной для рендерера ren1,
@@ -141,7 +207,7 @@ int main(int, char*[]) {
 
     // Шаг 1: Загрузка изображения фона
     vtkNew<vtkJPEGReader> backgroundReader;
-    backgroundReader->SetFileName("/home/aleksandr/PycharmProjects/barcodes/venv/photos/20231115_125455.jpg"); // Укажите правильный путь к файлу
+    backgroundReader->SetFileName(backgroundImageFilePath); // Укажите правильный путь к файлу
 
     // Шаг 2: Создание плоскости для фона
     vtkNew<vtkPlaneSource> backgroundPlane;
@@ -179,7 +245,7 @@ int main(int, char*[]) {
     light->SetLightTypeToSceneLight(); // Устанавливается тип света как "сценический свет", что означает,
     // что свет будет рассматриваться как часть сцены и будет влиять на объекты внутри нее.
 
-    light->SetPosition(5* 0.1, 5* -1.2, 5* 2.1); // Задается положение источника света в пространстве сцены.
+    light->SetPosition(5 * 0.1, 5 * -1.2, 5 * 2.1); // Задается положение источника света в пространстве сцены.
 
     light->SetPositional(true); // Указывает, что свет является позиционным (в отличие от направленного),
     // что означает, что он будет иметь определенное положение и характеристики, такие как затухание и конус света.
@@ -274,8 +340,13 @@ int main(int, char*[]) {
     windowToImageFilter->ReadFrontBufferOff(); // Чтение из заднего буфера, так как окно не отображается
     windowToImageFilter->Update();
 
+    std::ostringstream filePath;
+    auto imageName = split(backgroundImageFilePath, '/').back();
+    filePath << "../" << imageName; // Invalid operands to binary expression ('basic_ostream<char, std::char_traits<char>>' and 'void')
+
     vtkNew<vtkPNGWriter> pngWriter;
-    pngWriter->SetFileName("../screenshot.png");
+
+    pngWriter->SetFileName(filePath.str().c_str());
     pngWriter->SetInputConnection(windowToImageFilter->GetOutputPort());
     pngWriter->Write();
 
@@ -284,6 +355,26 @@ int main(int, char*[]) {
     polyDataWriter->SetFileName("../mesh.vtp");
     polyDataWriter->SetInputConnection(objReader->GetOutputPort());
     polyDataWriter->Write();
+
+    std::vector<std::array<double, 2>> coordinates;
+
+    // Где-то в вашем коде, когда вы получаете vtkActor* actor:
+    vtkPolyData* polyData = vtkPolyData::SafeDownCast(actor->GetMapper()->GetInput());
+
+    vtkPoints* points = polyData->GetPoints();
+
+    for(vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i) {
+        double* pt = points->GetPoint(i);
+        coordinates.push_back(Get2DProjection(camera, ren1, pt[0], pt[1], pt[2]));
+    }
+
+    auto imageNameWithoutExtension = split(imageName, '.').front();
+
+    std::ostringstream jsonFilePath;
+    jsonFilePath << "../" << imageNameWithoutExtension << ".json";
+
+    // Сохранение координат в файл JSON
+    SaveCoordinatesAsJSON(coordinates, jsonFilePath.str());
 
     // Начать взаимодействие
     iren->Start();

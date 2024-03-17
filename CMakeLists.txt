@@ -22,6 +22,9 @@ if (NOT VTK_FOUND)
     message(FATAL_ERROR "Tutorial_Step6: Unable to find the VTK build folder.")
 endif()
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 # Prevent a "command line is too long" failure in Windows.
 set(CMAKE_NINJA_FORCE_RESPONSE_FILE "ON" CACHE BOOL "Force Ninja to use response files.")
 add_executable(Tutorial_Step6 MACOSX_BUNDLE main.cpp )

@@ -52,7 +52,7 @@ build cmake_object_order_depends_target_Tutorial_Step6: phony || CMakeFiles/Tuto
 build CMakeFiles/Tutorial_Step6.dir/main.cpp.o: CXX_COMPILER__Tutorial_Step6_Debug /home/aleksandr/CLionProjects/individual/main.cpp || cmake_object_order_depends_target_Tutorial_Step6
   DEFINES = -Dkiss_fft_scalar=double -DvtkRenderingContext2D_AUTOINIT_INCLUDE=\"/home/aleksandr/CLionProjects/individual/cmake-build-debug/CMakeFiles/vtkModuleAutoInit_04d683062bbc5774e34e8c62b13e1a5a.h\" -DvtkRenderingCore_AUTOINIT_INCLUDE=\"/home/aleksandr/CLionProjects/individual/cmake-build-debug/CMakeFiles/vtkModuleAutoInit_04d683062bbc5774e34e8c62b13e1a5a.h\" -DvtkRenderingOpenGL2_AUTOINIT_INCLUDE=\"/home/aleksandr/CLionProjects/individual/cmake-build-debug/CMakeFiles/vtkModuleAutoInit_04d683062bbc5774e34e8c62b13e1a5a.h\"
   DEP_FILE = CMakeFiles/Tutorial_Step6.dir/main.cpp.o.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -fdiagnostics-color=always -std=gnu++20
   INCLUDES = -isystem /usr/local/include/vtk-9.3 -isystem /usr/local/include/vtk-9.3/vtkfreetype/include -isystem /usr/local/include/vtk-9.3/vtknlohmannjson/include
   OBJECT_DIR = CMakeFiles/Tutorial_Step6.dir
   OBJECT_FILE_DIR = CMakeFiles/Tutorial_Step6.dir
