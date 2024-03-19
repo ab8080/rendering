@@ -342,7 +342,7 @@ int main(int argc, char* argv[]) {
 
     std::ostringstream filePath;
     auto imageName = split(backgroundImageFilePath, '/').back();
-    filePath << "../" << imageName; // Invalid operands to binary expression ('basic_ostream<char, std::char_traits<char>>' and 'void')
+    filePath << "data/" << imageName; // надо добавить /.. перед data если запускать через IDE
 
     vtkNew<vtkPNGWriter> pngWriter;
 
@@ -371,7 +371,7 @@ int main(int argc, char* argv[]) {
     auto imageNameWithoutExtension = split(imageName, '.').front();
 
     std::ostringstream jsonFilePath;
-    jsonFilePath << "../" << imageNameWithoutExtension << ".json";
+    jsonFilePath << "data/" << imageNameWithoutExtension << ".json"; // надо добавить /.. перед data если запускать через IDE
 
     // Сохранение координат в файл JSON
     SaveCoordinatesAsJSON(coordinates, jsonFilePath.str());
