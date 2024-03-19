@@ -36,7 +36,7 @@ def generate_datamatrix(data):
 def generate_random_barcode(data):
     barcode_types = ['qrcode', 'azteccode', 'maxicode', 'datamatrix']
     selected_type = random.choice(barcode_types)
-    print(f"Selected barcode type: {selected_type}")
+    # print(f"Selected barcode type: {selected_type}")
     if selected_type == 'datamatrix':
         return generate_datamatrix(data)
     else:

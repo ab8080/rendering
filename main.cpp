@@ -22,6 +22,8 @@
 #include <vtkCylinderSource.h>
 #include <vtkPlaneSource.h>
 #include <sstream>
+#include <iostream>
+#include <random>
 
 namespace {
     class vtkMyCallback : public vtkCommand { // vtkCommand — это базовый класс для всех callback'ов в VTK,
@@ -46,6 +48,20 @@ namespace {
 
         }
     };
+}
+
+std::string generateRandomString(size_t length) {
+    const std::string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    std::string randomString;
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<> distribution(0, characters.size() - 1);
+
+    for(size_t i = 0; i < length; ++i) {
+        randomString += characters[distribution(generator)];
+    }
+
+    return randomString;
 }
 
 std::vector<std::string> split(const std::string& s, char delimiter) {
@@ -342,7 +358,8 @@ int main(int argc, char* argv[]) {
 
     std::ostringstream filePath;
     auto imageName = split(backgroundImageFilePath, '/').back();
-    filePath << "data/" << imageName; // надо добавить /.. перед data если запускать через IDE
+    std::string randomString = generateRandomString(4);
+    filePath << "data/" << randomString << "_" << imageName; // надо добавить /.. перед data если запускать через IDE
 
     vtkNew<vtkPNGWriter> pngWriter;
 
@@ -371,13 +388,13 @@ int main(int argc, char* argv[]) {
     auto imageNameWithoutExtension = split(imageName, '.').front();
 
     std::ostringstream jsonFilePath;
-    jsonFilePath << "data/" << imageNameWithoutExtension << ".json"; // надо добавить /.. перед data если запускать через IDE
+    jsonFilePath << "data/" << randomString << "_"  << imageNameWithoutExtension << ".json"; // надо добавить /.. перед data если запускать через IDE
 
     // Сохранение координат в файл JSON
     SaveCoordinatesAsJSON(coordinates, jsonFilePath.str());
 
     // Начать взаимодействие
-    iren->Start();
+    // iren->Start();
 
     return EXIT_SUCCESS;
 }
