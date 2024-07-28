@@ -1,0 +1,3 @@
+/home/aleksandr/CLionProjects/individual/cmake-build-debug/CMakeFiles/Tutorial_Step6.dir
+/home/aleksandr/CLionProjects/individual/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/aleksandr/CLionProjects/individual/cmake-build-debug/CMakeFiles/rebuild_cache.dir
